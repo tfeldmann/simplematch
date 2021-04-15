@@ -19,9 +19,12 @@ def register_type(name, regex, converter=str):
     types[name] = Type(regex=clean_regex, converter=converter)
 
 
-# include some types. Courtesy of https://ihateregex.io/
+# include some useful types
 register_type("int", r"[+-]?[0-9]+", int)
 register_type("float", r"[+-]?([0-9]*[.])?[0-9]+", float)
+
+# found on https://ihateregex.io/
+register_type("bitcoin", r"(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}")
 register_type("email", r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 register_type("ssn", r"(?!0{3})(?!6{3})[0-8]\d{2}-(?!0{2})\d{2}-(?!0{4})\d{4}")
 register_type(
@@ -29,6 +32,23 @@ register_type(
     (
         r"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]"
         r"?)){3}"
+    ),
+)
+register_type(
+    "url",
+    (
+        r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA"
+        r"-Z0-9()!@:%_\+.~#?&\/\/=]*)"
+    ),
+)
+
+register_type(
+    # Visa, MasterCard, American Express, Diners Club, Discover, JCB
+    "ccard",
+    (
+        r"(^4[0-9]{12}(?:[0-9]{3})?$)|(^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6]["
+        r"0-9]{2}|27[01][0-9]|2720)[0-9]{12}$)|(3[47][0-9]{13})|(^3(?:0[0-5]|[68][0-9])"
+        r"[0-9]{11}$)|(^6(?:011|5[0-9]{2})[0-9]{12}$)|(^(?:2131|1800|35\d{3})\d{11}$)"
     ),
 )
 register_type(
@@ -43,26 +63,6 @@ register_type(
         r"]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0"
         r"-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,"
         r"3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
-    ),
-)
-# Visa, MasterCard, American Express, Diners Club, Discover, JCB
-register_type(
-    "ccard",
-    (
-        r"(^4[0-9]{12}(?:[0-9]{3})?$)|(^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6]["
-        r"0-9]{2}|27[01][0-9]|2720)[0-9]{12}$)|(3[47][0-9]{13})|(^3(?:0[0-5]|[68][0-9])"
-        r"[0-9]{11}$)|(^6(?:011|5[0-9]{2})[0-9]{12}$)|(^(?:2131|1800|35\d{3})\d{11}$)"
-    ),
-)
-register_type(
-    "bitcoin",
-    r"(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}",
-)
-register_type(
-    "url",
-    (
-        r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA"
-        r"-Z0-9()!@:%_\+.~#?&\/\/=]*)"
     ),
 )
 
