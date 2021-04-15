@@ -1,35 +1,12 @@
 """
-Inspired by https://www.npmjs.com/package/easypattern
-
-Basic testings
-
-var easyPattern = require("easyPattern");
-
-var pattern = easyPattern("{file}.js");
-pattern.test("archive.zip"); // false
-pattern.test("index.js"); // true
-Basic matching
-
-var pattern = easyPattern("{folder}/{filename}.js");
-var result = pattern.match("foo/bar.js");
-
-//result = {folder: "foo", filename: "bar"}
-Wildcard matching
-
-var pattern = easyPattern("*.{extension}");
-var result = pattern.match("/root/folder/file.exe");
-
-//result = {extension:"exe"}
-Advance matching
-
-var pattern = easyPattern("{*}/{filename}?{*}");
-var result = pattern.match("www.site.com/home/hello.js?p=1");
-
-//result = {1:"www.site.com/home", 2:"p=1", filename:"hello.js"}
-
-
+easymatch
 """
 import re
+
+TYPES = {
+    "int": (r"[+-]?0|[1-9][0-9]*", int),
+    "float": (r"[+-]?([0-9]*[.])?[0-9]+", float),
+}
 
 
 def create_regex(pattern):
@@ -38,7 +15,6 @@ def create_regex(pattern):
         .replace("-", r"\-")
         .replace("[", r"\[")
         .replace("]", r"\]")
-        .replace("*{", r"*/{")
         .replace("*", r".*")
         .replace("?", r"\?")
         .replace("(", r"{")
@@ -65,14 +41,15 @@ def grouplist(match):
 class Matcher:
     def __init__(self, pattern):
         self.pattern = pattern
-        self.regex = re.compile(create_regex(pattern))
+        self.regex = create_regex(pattern)
+        self._regex = re.compile(self.regex)
 
     def test(self, string):
-        match = self.regex.search(string)
+        match = self._regex.search(string)
         return match is not None
 
     def match(self, string):
-        match = self.regex.search(string)
+        match = self._regex.search(string)
         if match:
             result = match.groupdict()
             for i, x in enumerate(grouplist(match)):
@@ -93,5 +70,6 @@ def match(pattern, string):
 
 
 if __name__ == "__main__":
-    m = Matcher("*.test")
-    print(m)
+    m = Matcher("{year__int}")
+    print(m.regex)
+    print(m.match("2012"))
