@@ -8,6 +8,21 @@ def test_readme_example():
     )
     assert result == {"year": "2021", "month": "01", "day": "15"}
 
+    result = em.match("{year:int}-{month:int}: {value:float}", "2021-01: -12.786")
+    assert result == {"year": 2021, "month": 1, "value": -12.786}
+
+
+def test_readme_example_typehints():
+    matcher = em.Matcher("{year:int}-{month:int}: {value:float}")
+
+    assert matcher.match("2021-01: -12.786") == {
+        "year": 2021,
+        "month": 1,
+        "value": -12.786,
+    }
+    assert matcher.match("2021-01-abc: Hello") == {}
+    assert matcher.test("1234-01: 123.123") == True
+
 
 def test_extended_readme_example():
     result = em.match(
