@@ -1,5 +1,3 @@
-# THIS LIBRARY IS IN DEVELOPMENT AND NOT USABLE AT THE MOMENT AND NOT EVEN ON PYPI YET
-
 # easymatch
 
 Minimal, layman-readable string pattern matching for python.
