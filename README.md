@@ -1,6 +1,6 @@
 # easymatch
 
-Minimal, layman-readable string pattern matching for python.
+Minimal, super readable string pattern matching for python.
 
 ## Example:
 
