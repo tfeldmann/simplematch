@@ -36,6 +36,9 @@ def register_type(name, regex, converter=str):
     types[name] = Type(regex=regex, converter=converter)
 
 
+_special_chars_map = {i: "\\" + chr(i) for i in b"()[]?*+-|^$\\.&~# \t\n\r\v\f"}
+
+
 def grouplist(match):
     """ extract unnamed match groups """
     # https://stackoverflow.com/a/53385788/300783
@@ -88,7 +91,7 @@ class Matcher:
         match = re.search(r"\{(\w+)\}", matchobj.group(0))
         if match:
             name = match.group(1)
-            return r"(?P<%s>\w+)" % name
+            return r"(?P<%s>.*)" % name
 
     def create_regex(self, pattern):
         # empty converters
@@ -103,12 +106,15 @@ class Matcher:
             .replace("?", r"\?")
             .replace("(", r"\(")
             .replace(")", r"\)")
+            .replace("/", r"\/")
         )
         # handle named and wildcard matches
         result = re.sub(r"\{\.\*\}", r"(.*)", result)
         # result = re.sub(r"\{([^\}]*)\}", r"(?P<\1>.*)", result)
         result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)
         return "^%s$" % result
+
+        re.escape
 
     def __repr__(self):
         return '<Matcher("%s")>' % self.pattern
