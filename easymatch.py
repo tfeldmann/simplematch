@@ -33,19 +33,6 @@ import re
 
 
 def create_regex(pattern):
-
-    # .replace(\., "\\.")
-    # .replace(\-, "\\-")
-    # .replace(\[, "\\[")
-    # .replace(\], "\\]")
-    # .replace(\*\{, "*/{")
-    # .replace(\*, ".*")
-    # .replace(\?, "\\?")
-    # .replace(\(, "{")
-    # .replace(\), "}")
-    # .replace(\{\.\*\}/g,"(.*)")
-    # .replace(\{[^\}]*\}/g,"([^\/]+)");
-
     result = (
         pattern.replace(".", r"\.")
         .replace("-", r"\-")
@@ -59,7 +46,6 @@ def create_regex(pattern):
     )
     result = re.sub(r"\{\.\*\}", r"(.*)", result)
     result = re.sub(r"\{([^\}]*)\}", r"(?P<\1>.*)", result)
-
     return result
 
 
@@ -78,29 +64,34 @@ def grouplist(match):
 
 class Matcher:
     def __init__(self, pattern):
-        self.source = pattern
-        self.pattern = convert_to_regex(pattern)
+        self.pattern = pattern
+        self.regex = re.compile(create_regex(pattern))
 
-    def __str__(self):
-        return "Matcher(%s)" % self.source
+    def test(self, string):
+        match = self.regex.search(string)
+        return match is not None
+
+    def match(self, string):
+        match = self.regex.search(string)
+        if match:
+            result = match.groupdict()
+            for i, x in enumerate(grouplist(match)):
+                result[i] = x
+            return result
+        return {}
+
+    def __repr__(self):
+        return '<Matcher("%s")>' % self.pattern
 
 
 def test(pattern, string):
-    pass
+    return Matcher(pattern).test(string)
 
 
 def match(pattern, string):
-    regex = create_regex(pattern)
-    print(pattern + " -> " + regex)
-    print(string)
-    match = re.search(regex, string)
-    if match:
-        result = match.groupdict()
-        for i, x in enumerate(grouplist(match)):
-            result[i] = x
-        print(result)
-    print()
+    return Matcher(pattern).match(string)
 
 
 if __name__ == "__main__":
-    pass
+    m = Matcher("*.test")
+    print(m)
