@@ -7,26 +7,35 @@ import re
 from argparse import ArgumentParser
 from collections import namedtuple
 
-Type = namedtuple("Type", "regex converter")
 
+# taken from the standard re module, minus "*{}"
+_special_chars = {i: "\\" + chr(i) for i in b"()[]?+-|^$\\.&~# \t\n\r\v\f"}
+
+# dict of known types
+Type = namedtuple("Type", "regex converter")
 types = {
-    "int": Type(regex=r"[+-]?0|[1-9][0-9]*", converter=int),
-    "float": Type(regex=r"[+-]?(?:[0-9]*[.])?[0-9]+", converter=float),
-    "email": Type(
-        regex=r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", converter=str
+    "int": Type(
+        regex=r"[+-]?0|[1-9][0-9]*",
+        converter=int,
     ),
-    "phone": Type(
-        regex=r"[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}", converter=str
+    "float": Type(
+        regex=r"[+-]?([0-9]*[.])?[0-9]+",
+        converter=float,
+    ),
+    "email": Type(
+        regex=r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+",
+        converter=str,
     ),
     "ssn": Type(
-        regex=r"(?!0{3})(?!6{3})[0-8]\d{2}-(?!0{2})\d{2}-(?!0{4})\d{4}", converter=str
+        regex=r"(?!0{3})(?!6{3})[0-8]\d{2}-(?!0{2})\d{2}-(?!0{4})\d{4}",
+        converter=str,
     ),
     "ipv4": Type(
-        regex=r"(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}",
+        regex=r"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}",
         converter=str,
     ),
     "ipv6": Type(
-        regex=r"(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))",
+        regex=r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))",
         converter=str,
     ),
 }
@@ -34,9 +43,6 @@ types = {
 
 def register_type(name, regex, converter=str):
     types[name] = Type(regex=regex, converter=converter)
-
-
-_special_chars_map = {i: "\\" + chr(i) for i in b"()[]?*+-|^$\\.&~# \t\n\r\v\f"}
 
 
 def grouplist(match):
@@ -84,8 +90,11 @@ class Matcher:
         match = re.search(r"\{(\w+):(\w+)\}", matchobj.group(0))
         if match:
             name, type_ = match.groups()
+            # register this field to convert it later
             self._converters[name] = types[type_].converter
-            return "(?P<%s>%s)" % (name, types[type_].regex)
+            # ensure all groups to be non-capturing
+            regex = re.sub(r"(?<!\\)\((?!\?)", r"(?:", types[type_].regex)
+            return "(?P<%s>%s)" % (name, regex)
 
         # field without type annotation
         match = re.search(r"\{(\w+)\}", matchobj.group(0))
@@ -94,27 +103,12 @@ class Matcher:
             return r"(?P<%s>.*)" % name
 
     def create_regex(self, pattern):
-        # empty converters
-        self._converters.clear()
-        # escape some common characters
-        result = (
-            pattern.replace(".", r"\.")
-            .replace("-", r"\-")
-            .replace("[", r"\[")
-            .replace("]", r"\]")
-            .replace("*", r".*")
-            .replace("?", r"\?")
-            .replace("(", r"\(")
-            .replace(")", r"\)")
-            .replace("/", r"\/")
-        )
-        # handle named and wildcard matches
-        result = re.sub(r"\{\.\*\}", r"(.*)", result)
-        # result = re.sub(r"\{([^\}]*)\}", r"(?P<\1>.*)", result)
-        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)
+        self._converters.clear()  # empty converters
+        result = pattern.translate(_special_chars)  # escape special chars
+        result = result.replace("*", r".*")  # handle wildcards
+        result = re.sub(r"\{\.\*\}", r"(.*)", result)  # handle wildcard match
+        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)  # handle named match
         return "^%s$" % result
-
-        re.escape
 
     def __repr__(self):
         return '<Matcher("%s")>' % self.pattern
@@ -130,7 +124,13 @@ def match(pattern, string):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("pattern")
-    parser.add_argument("string")
+    parser.add_argument("pattern", help="A matching pattern")
+    parser.add_argument("string", help="The string to match")
+    parser.add_argument(
+        "--regex", action="store_true", help="Show the generated regular expression"
+    )
     args = parser.parse_args()
-    print(json.dumps(Matcher(args.pattern).match(args.string)))
+    m = Matcher(args.pattern)
+    print(json.dumps(m.match(args.string)))
+    if args.regex:
+        print("Regex: " + m.regex)
