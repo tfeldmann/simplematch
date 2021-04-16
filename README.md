@@ -29,7 +29,7 @@ Capture groups can be named (`{name}`), unnamed (`{*}`) and typed (`{name:float}
 
 The following types are available:
 
-- `ìnt`
+- `int`
 - `float`
 - `email`
 - `url`
