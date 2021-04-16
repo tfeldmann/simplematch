@@ -5,7 +5,7 @@
 > Minimal, super readable string pattern matching for python.
 
 [![PyPI Version][pypi-image]][pypi-url]
-[![tests](github-image)](github-url)
+[![tests](https://github.com/tfeldmann/simplematch/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/tfeldmann/simplematch/actions/workflows/tests.yml)
 
 ```python
 import simplematch
@@ -128,5 +128,3 @@ before big changes.
 
 [pypi-image]: https://img.shields.io/pypi/v/simplematch
 [pypi-url]: https://pypi.org/project/simplematch/
-[github-image]: https://github.com/tfeldmann/simplematch/actions/workflows/test.yml/badge.svg
-[github-url]: https://github.com/tfeldmann/simplematch/actions/workflows/test.yml
