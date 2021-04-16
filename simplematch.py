@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
 """
-easymatch
+    simplematch
 """
 import re
 from collections import namedtuple
 
-# taken from the standard re module, minus "*{}"
-_special_chars = {i: "\\" + chr(i) for i in b"()[]?+-|^$\\.&~# \t\n\r\v\f"}
+# taken from the standard re module - minus "*{}", because that's our own syntax
+SPECIAL_CHARS = {i: "\\" + chr(i) for i in b"()[]?+-|^$\\.&~# \t\n\r\v\f"}
 
-# dict of known types
+# a regex that ensures all groups to be non-capturing. Otherwise they would appear in
+# the matches
+TYPE_CLEANUP_REGEX = re.compile(r"(?<!\\)\((?!\?)")
+
+# `types` is the dict of known types that is filled with register_type
 Type = namedtuple("Type", "regex converter")
 types = {}
 
 
 def register_type(name, regex, converter=str):
-    # ensure all groups to be non-capturing
-    clean_regex = re.sub(r"(?<!\\)\((?!\?)", r"(?:", regex)
-    types[name] = Type(regex=clean_regex, converter=converter)
+    cleaned = TYPE_CLEANUP_REGEX.sub("(?:", regex)
+    types[name] = Type(regex=cleaned, converter=converter)
 
 
-# include some useful types
+# include some useful basic types
 register_type("int", r"[+-]?[0-9]+", int)
 register_type("float", r"[+-]?([0-9]*[.])?[0-9]+", float)
 
@@ -101,7 +104,7 @@ class Matcher:
             name, type_ = match.groups()
             # register this field to convert it later
             self._converters[name] = types[type_].converter
-            return "(?P<%s>%s)" % (name, types[type_].regex)
+            return r"(?P<%s>%s)" % (name, types[type_].regex)
 
         # field without type annotation
         match = re.search(r"\{(\w+)\}", matchobj.group(0))
@@ -111,11 +114,11 @@ class Matcher:
 
     def _create_regex(self, pattern):
         self._converters.clear()  # empty converters
-        result = pattern.translate(_special_chars)  # escape special chars
+        result = pattern.translate(SPECIAL_CHARS)  # escape special chars
         result = result.replace("*", r".*")  # handle wildcards
         result = re.sub(r"\{\.\*\}", r"(.*)", result)  # handle wildcard match
         result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)  # handle named match
-        return "^%s$" % result
+        return r"^%s$" % result
 
     @staticmethod
     def _grouplist(match):

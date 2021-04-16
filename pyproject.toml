@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "easymatch"
+name = "simplematch"
 version = "0.1.0"
 description = "Minimal, layman-readable string pattern matching."
 authors = ["Thomas Feldmann <mail@tfeldmann.de>"]

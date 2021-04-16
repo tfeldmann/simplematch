@@ -1,4 +1,4 @@
-import easymatch as em
+import simplematch as em
 
 
 def test_readme_example():
