@@ -47,7 +47,7 @@ Then use one of these functions:
 import simplematch
 
 simplematch.match(pattern, string) # -> returns a dict
-simplematch.test(pattern, string)
+simplematch.test(pattern, string)  # -> return True / False
 ```
 
 Or use a `Matcher` object:
@@ -58,7 +58,8 @@ import simplematch as sm
 matcher = sm.Matcher(pattern)
 
 matcher.match(string) # -> returns a dict
-matcher.test(string)
+matcher.test(string)  # -> returns True / False
+matcher.regex         # -> shows the generated regex
 ```
 
 ## Basic usage
