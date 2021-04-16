@@ -1,6 +1,8 @@
 # simplematch
 
-Minimal, super readable string pattern matching for python.
+> Minimal, super readable string pattern matching for python.
+
+[![PyPI Version][pypi-image]][pypi-url]
 
 ## Basic example:
 
@@ -37,3 +39,12 @@ I use it in some applications to provide pattern matching functionality to endus
 
 This library started as a python fork of https://github.com/nadav-dav/EasyPattern.
 So kudos to you for the nice syntax!
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
+<!-- Badges -->
+
+[pypi-image]: https://img.shields.io/pypi/v/simplematch
+[pypi-url]: https://pypi.org/project/simplematch/

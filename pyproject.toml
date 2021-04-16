@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "simplematch"
 version = "0.1.0"
-description = "Minimal, layman-readable string pattern matching."
+description = "Minimal, super readable string pattern matching."
 authors = ["Thomas Feldmann <mail@tfeldmann.de>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/tfeldmann/simplematch"
 
 [tool.poetry.dependencies]
 python = "^3.6"
