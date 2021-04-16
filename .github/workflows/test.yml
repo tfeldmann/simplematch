@@ -34,8 +34,8 @@ jobs:
 
       - name: Run pytest
         run: |
-          python -m pytest
+          poetry run pytest
 
       - name: Run mypy
         run: |
-          python -m mypy simplematch.py
+          poetry run mypy .
