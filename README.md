@@ -9,6 +9,9 @@ import simplematch
 
 simplematch.match("He* {planet}!", "Hello World!")
 >>> {"planet": "World"}
+
+simplematch.match("It* {temp:float}°C *", "It's -10.2°C outside!")
+>>> {"temp": -10.2}
 ```
 
 ## Installation
@@ -22,7 +25,7 @@ simplematch.match("He* {planet}!", "Hello World!")
 - wildcard `*`
 - capture group `{capture_name}`
 
-Capture groups can be named (`{name}`), unnamed (`{*}`) and typed (`{value:float}`).
+Capture groups can be named (`{name}`), unnamed (`{*}`) and typed (`{name:float}`).
 
 The following types are available:
 
@@ -33,7 +36,7 @@ The following types are available:
 - `ipv4`
 - `ipv6`
 - `bitcoin`
-- `ssn` (Social security number)
+- `ssn` (social security number)
 - `ccard` (matches Visa, MasterCard, American Express, Diners Club, Discover, JCB)
 
 For now, only named capture groups can be typed.

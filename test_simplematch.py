@@ -2,6 +2,12 @@ import simplematch as sm
 
 
 def test_readme_example():
+    assert sm.match("He* {planet}!", "Hello World!") == {"planet": "World"}
+
+    assert sm.match("It* {temp:float}°C *", "It's -10.2°C outside!") == {
+        "temp": -10.2
+    }
+
     result = sm.match(
         pattern="Invoice*_{year}_{month}_{day}.pdf",
         string="Invoice_RE2321_2021_01_15.pdf",
