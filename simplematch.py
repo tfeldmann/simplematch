@@ -26,7 +26,7 @@ def register_type(name, regex, converter=str):
 # include some useful basic types
 register_type("int", r"[+-]?[0-9]+", int)
 register_type("float", r"[+-]?([0-9]*[.])?[0-9]+", float)
-register_type("letter", r"[a-zA-Z]+")
+register_type("letters", r"[a-zA-Z]+")
 
 # found on https://ihateregex.io/
 register_type("bitcoin", r"(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}")

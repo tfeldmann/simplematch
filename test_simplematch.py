@@ -94,11 +94,12 @@ def test_type_float():
     assert m.match("+123.4") == {"num": 123.4}
     assert m.match("+000123.4") == {"num": 123.4}
 
+
 def test_type_letter():
-    m = sm.Matcher("*{chars:letter}*")
-    assert m.match("0abcf123") == {"chars": "abcf"}
-    assert m.match("23abcf123") == {"chars": "abcf"}
-    assert m.match("#ACBAAC") == {"chars": "ACBAAC"}
+    m = sm.Matcher("{chars:letters}*")
+    assert m.match("abcf123") == {"chars": "abcf"}
+    assert m.match("abcf123#") == {"chars": "abcf"}
+    assert m.match("ACBAAC_123") == {"chars": "ACBAAC"}
 
 
 def test_type_bitcoin():
