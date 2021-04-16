@@ -4,6 +4,17 @@
 
 [![PyPI Version][pypi-image]][pypi-url]
 
+```python
+import simplematch
+
+simplematch.match("He* {planet}!", "Hello World!")
+>>> {"planet": "World"}
+```
+
+## Installation
+
+`pip install simplematch`
+
 ## Syntax
 
 `simplematch` has only two syntax elements:
@@ -24,6 +35,28 @@ The following types are available:
 - `bitcoin`
 - `ssn` (Social security number)
 - `ccard` (matches Visa, MasterCard, American Express, Diners Club, Discover, JCB)
+
+For now, only named capture groups can be typed.
+
+Then use one of these functions:
+
+```python
+import simplematch
+
+simplematch.match(pattern, string) # -> returns a dict
+simplematch.test(pattern, string)
+```
+
+Or use a `Matcher` object:
+
+```python
+import simplematch as sm
+
+matcher = sm.Matcher(pattern)
+
+matcher.match(string) # -> returns a dict
+matcher.test(string)
+```
 
 ## Basic usage
 
@@ -74,6 +107,11 @@ The `simplematch` syntax is transpiled to regular expressions under the hood, so
 matching performance should be just as good.
 
 I hope you get some good use out of this!
+
+## Contributions
+
+Contributions are welcome! Just submit a PR and maybe get in touch with me via email
+before big changes.
 
 ## License
 
