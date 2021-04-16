@@ -26,6 +26,7 @@ def register_type(name, regex, converter=str):
 # include some useful basic types
 register_type("int", r"[+-]?[0-9]+", int)
 register_type("float", r"[+-]?([0-9]*[.])?[0-9]+", float)
+register_type("letter", r"[a-zA-Z]+")
 
 # found on https://ihateregex.io/
 register_type("bitcoin", r"(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}")
@@ -116,9 +117,9 @@ class Matcher:
     def _create_regex(self, pattern):
         self._converters.clear()  # empty converters
         result = pattern.translate(SPECIAL_CHARS)  # escape special chars
-        result = result.replace("*", r".*")  # handle wildcards
-        result = re.sub(r"\{\.\*\}", r"(.*)", result)  # handle wildcard match
-        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)  # handle named match
+        result = result.replace("*", r".*")  # handle wildcard
+        result = re.sub(r"\{\}", r"(.*)", result)  # handle unnamed group
+        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)  # handle named group
         return r"^%s$" % result
 
     @staticmethod
@@ -146,6 +147,10 @@ def test(pattern, string):
 
 def match(pattern, string):
     return Matcher(pattern).match(string)
+
+
+def to_regex(pattern):
+    return Matcher(pattern).regex
 
 
 if __name__ == "__main__":

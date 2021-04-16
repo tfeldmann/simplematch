@@ -26,9 +26,9 @@ simplematch.match("It* {temp:float}°C *", "It's -10.2°C outside!")
 `simplematch` has only two syntax elements:
 
 - wildcard `*`
-- capture group `{capture_name}`
+- capture group `{name}`
 
-Capture groups can be named (`{name}`), unnamed (`{*}`) and typed (`{name:float}`).
+Capture groups can be named (`{name}`), unnamed (`{}`) and typed (`{name:float}`).
 
 The following types are available:
 

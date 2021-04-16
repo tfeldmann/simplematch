@@ -1,26 +1,22 @@
 import simplematch as sm
 
 
-def test_readme_example():
+def test_readme_example_opener():
     assert sm.match("He* {planet}!", "Hello World!") == {"planet": "World"}
+    assert sm.match("It* {temp:float}°C *", "It's -10.2°C outside!") == {"temp": -10.2}
 
-    assert sm.match("It* {temp:float}°C *", "It's -10.2°C outside!") == {
-        "temp": -10.2
-    }
 
+def test_readme_example_basic_usage():
     result = sm.match(
         pattern="Invoice*_{year}_{month}_{day}.pdf",
         string="Invoice_RE2321_2021_01_15.pdf",
     )
     assert result == {"year": "2021", "month": "01", "day": "15"}
-
-    result = sm.match("{year:int}-{month:int}: {value:float}", "2021-01: -12.786")
-    assert result == {"year": 2021, "month": 1, "value": -12.786}
+    assert sm.test("ABC-{value:int}", "ABC-13")
 
 
 def test_readme_example_typehints():
     matcher = sm.Matcher("{year:int}-{month:int}: {value:float}")
-
     assert matcher.match("2021-01: -12.786") == {
         "year": 2021,
         "month": 1,
@@ -28,36 +24,26 @@ def test_readme_example_typehints():
     }
     assert matcher.match("2021-01-abc: Hello") == {}
     assert matcher.test("1234-01: 123.123") == True
-
-
-def test_extended_readme_example():
-    result = sm.match(
-        pattern="{path}/Invoice*_{year}_{month}_{day}.pdf",
-        string="~/Documents/Invoices/Invoice_RE2321_2021_01_15.pdf",
+    assert (
+        matcher.regex
+        == "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$"
     )
-    assert result == {
-        "path": "~/Documents/Invoices",
-        "year": "2021",
-        "month": "01",
-        "day": "15",
-    }
-
-
-def test_regex():
-    sm.test("{file}.js", "archive.zip")
-    sm.test("{file}.js", "index.js")
-    sm.test("{folder}/{filename}.js", "foo/bar.js")
-    sm.test("*.{extension}", "/root/folder/file.exe")
-    sm.test("{folder}/{filename}.{extension}", "test/123.pdf")
-    sm.test("{*}/{filename}?{*}", "www.site.com/home/hello.js?p=1")
 
 
 def test_simple():
     assert sm.test("*.py", "hello.py")
     assert not sm.test("*.zip", "hello.py")
-
     assert sm.test("{file}.py", "hello.py")
     assert not sm.test("{file}.zip", "hello.py")
+
+    assert sm.test("{folder}/{filename}.js", "foo/bar.js")
+    assert sm.test("*.{extension}", "/root/folder/file.exe")
+    assert sm.test("{folder}/{filename}.{extension}", "test/123.pdf")
+    assert sm.test("{}/{filename}?{}", "www.site.com/home/hello.js?p=1")
+
+
+def test_unnamed_wildcards():
+    assert sm.match("{} sees {}", "Tim sees Jacob") == {0: "Tim", 1: "Jacob"}
 
 
 def test_simple_matching():
@@ -83,7 +69,7 @@ def test_simple_matching():
     assert not sm.match("*{filename}", "home/hello.js") == dict(filename="hello.js")
 
     # should save wild cards
-    assert sm.match("{*}/{filename}?{*}", "www.site.com/home/hello.js?p=1") == {
+    assert sm.match("{}/{filename}?{}", "www.site.com/home/hello.js?p=1") == {
         0: "www.site.com/home",
         1: "p=1",
         "filename": "hello.js",
@@ -107,6 +93,12 @@ def test_type_float():
     assert m.match("-123.0")
     assert m.match("+123.4") == {"num": 123.4}
     assert m.match("+000123.4") == {"num": 123.4}
+
+def test_type_letter():
+    m = sm.Matcher("*{chars:letter}*")
+    assert m.match("0abcf123") == {"chars": "abcf"}
+    assert m.match("23abcf123") == {"chars": "abcf"}
+    assert m.match("#ACBAAC") == {"chars": "ACBAAC"}
 
 
 def test_type_bitcoin():
