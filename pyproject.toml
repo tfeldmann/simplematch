@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simplematch"
-version = "1.0"
+version = "1.1"
 description = "Minimal, super readable string pattern matching."
 authors = ["Thomas Feldmann <mail@tfeldmann.de>"]
 license = "MIT"
