@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    simplematch
+simplematch
 """
 import re
 from collections import namedtuple
@@ -18,6 +18,7 @@ types = {}
 
 
 def register_type(name, regex, converter=str):
+    """ register a type to be available for the {value:type} matching syntax """
     cleaned = TYPE_CLEANUP_REGEX.sub("(?:", regex)
     types[name] = Type(regex=cleaned, converter=converter)
 
@@ -127,7 +128,7 @@ class Matcher:
         named = match.groupdict()
         ignored_groups = set()
         for name, index in match.re.groupindex.items():
-            if name in named:  # check twice, if it is really the named attribute.
+            if name in named:  # check twice if it is really the named attribute
                 ignored_groups.add(index)
         return [
             group
