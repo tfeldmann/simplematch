@@ -1,5 +1,7 @@
 # simplematch
 
+ <img width="500" src="https://github.com/tfeldmann/simplematch/raw/master/docs/simplematch.svg?sanitize=true" alt="logo">
+
 > Minimal, super readable string pattern matching for python.
 
 [![PyPI Version][pypi-image]][pypi-url]
