@@ -167,3 +167,19 @@ def test_type_url():
     assert m.match("https://xkcd.com/2293/") == {"url": "https://xkcd.com/2293/"}
     assert not m.match("https://this-shouldn't.match@example.com")
     assert m.match("http://www.example.com/") == {"url": "http://www.example.com/"}
+
+
+def test_register_type():
+    def mood_detect(smiley):
+        moods = {
+            ":)": "good",
+            ":(": "bad",
+            ":/": "sceptic",
+        }
+        return moods.get(smiley, "unknown")
+
+    sm.register_type("smiley", r":[\(\)\/]", mood_detect)
+
+    assert sm.match("I'm feeling {mood:smiley} *", "I'm feeling :) today!") == {
+        "mood": "good"
+    }

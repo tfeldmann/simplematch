@@ -105,6 +105,38 @@ matcher.regex
 >>> '^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$'
 ```
 
+## Adding your own types
+
+You can register your own types to be available for the `{value:type}` matching syntax
+with the `register_type` function.
+
+`simplematch.register_type(name, regex, converter=str)`
+
+- `name` is the type name which you can use in the matching syntax
+- `regex` is a regular expression
+- `converter` is a callable to convert a match
+
+### Example
+
+Register a `smiley` type to detect smileys (`:) :( :/`) and getting their mood:
+
+```python
+import simplematch as sm
+
+def mood_convert(smiley):
+    moods = {
+        ":)": "good",
+        ":(": "bad",
+        ":/": "sceptic",
+    }
+    return moods.get(smiley, "unknown")
+
+sm.register_type("smiley", r":[\)\(\/]", mood_convert)
+
+sm.match("I'm feeling {mood:smiley} *", "I'm feeling :) today!")
+>>> {"mood": "good"}
+```
+
 ## Background
 
 `simplematch` aims to fill a gap between parsing with `str.split()` and regular
