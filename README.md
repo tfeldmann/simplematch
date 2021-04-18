@@ -5,6 +5,7 @@
 > Minimal, super readable string pattern matching for python.
 
 [![PyPI Version][pypi-image]][pypi-url]
+![PyPI - License](https://img.shields.io/pypi/l/simplematch)
 [![tests](https://github.com/tfeldmann/simplematch/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/tfeldmann/simplematch/actions/workflows/tests.yml)
 
 ```python
@@ -21,7 +22,7 @@ simplematch.match("It* {temp:float}°C *", "It's -10.2°C outside!")
 
 `pip install simplematch`
 
-Requires python >= 3.5
+(Or just drop the `simplematch.py` file in your project.)
 
 ## Syntax
 
