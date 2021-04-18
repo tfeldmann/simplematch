@@ -21,6 +21,8 @@ simplematch.match("It* {temp:float}°C *", "It's -10.2°C outside!")
 
 `pip install simplematch`
 
+Requires python >= 3.5
+
 ## Syntax
 
 `simplematch` has only two syntax elements:
@@ -81,7 +83,7 @@ sm.test("ABC-{value:int}", "ABC-13")
 >>> True
 ```
 
-## Type hints
+## Typed matches
 
 ```python
 import simplematch as sm
@@ -103,22 +105,26 @@ matcher.test("1234-01: 123.123")
 # show generated regular expression
 matcher.regex
 >>> '^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$'
+
+# show registered converters
+matcher.converters
+>>> {'year': <class 'int'>, 'month': <class 'int'>, 'value': <class 'float'>}
 ```
 
-## Adding your own types
+## Register your own types
 
-You can register your own types to be available for the `{value:type}` matching syntax
+You can register your own types to be available for the `{name:type}` matching syntax
 with the `register_type` function.
 
 `simplematch.register_type(name, regex, converter=str)`
 
-- `name` is the type name which you can use in the matching syntax
-- `regex` is a regular expression
-- `converter` is a callable to convert a match
+- `name` is the name to use in the matching syntax
+- `regex` is a regular expression to match your type
+- `converter` is a callable to convert a match (`str` by default)
 
 ### Example
 
-Register a `smiley` type to detect smileys (`:) :( :/`) and getting their mood:
+Register a `smiley` type to detect smileys (`:)`, `:(`, `:/`) and getting their moods:
 
 ```python
 import simplematch as sm
