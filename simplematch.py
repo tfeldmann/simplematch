@@ -74,7 +74,7 @@ register_type(
 
 class Matcher:
     def __init__(self, pattern):
-        self._converters = {}
+        self.converters = {}
         self.pattern = pattern
 
         # cache the compiled regex
@@ -94,7 +94,7 @@ class Matcher:
                 result[i] = x
 
             # run converters
-            for key, converter in self._converters.items():
+            for key, converter in self.converters.items():
                 result[key] = converter(result[key])
             return result
         return {}
@@ -105,7 +105,7 @@ class Matcher:
         if match:
             name, type_ = match.groups()
             # register this field to convert it later
-            self._converters[name] = types[type_].converter
+            self.converters[name] = types[type_].converter
             return r"(?P<%s>%s)" % (name, types[type_].regex)
 
         # field without type annotation
@@ -115,7 +115,7 @@ class Matcher:
             return r"(?P<%s>.*)" % name
 
     def _create_regex(self, pattern):
-        self._converters.clear()  # empty converters
+        self.converters.clear()  # empty converters
         result = pattern.translate(SPECIAL_CHARS)  # escape special chars
         result = result.replace("*", r".*")  # handle wildcard
         result = re.sub(r"\{\}", r"(.*)", result)  # handle unnamed group

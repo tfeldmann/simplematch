@@ -28,6 +28,7 @@ def test_readme_example_typehints():
         matcher.regex
         == "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$"
     )
+    assert matcher.converters == {"year": int, "month": int, "value": float}
 
 
 def test_simple():
