@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP
+
+- Adds a `case_sensitive` option to `test()` and `match()` function. (`True` by default)
+
 ## v1.2 (2021-04-19)
 
 - `match()` now returns an empty dict on matches with capture groups, `None` otherwise.

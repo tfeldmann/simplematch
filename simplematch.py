@@ -73,20 +73,18 @@ register_type(
 
 
 class Matcher:
-    def __init__(self, pattern):
+    def __init__(self, pattern="*", case_sensitive=True):
         self.converters = {}
         self.pattern = pattern
-
-        # cache the compiled regex
+        self.case_sensitive = case_sensitive
         self.regex = self._create_regex(pattern)
-        self._regex = re.compile(self.regex)
 
     def test(self, string):
-        match = self._regex.match(string)
+        match = self._regex_compiled.match(string)
         return match is not None
 
     def match(self, string):
-        match = self._regex.match(string)
+        match = self._regex_compiled.match(string)
         if match:
             # assemble result dict
             result = match.groupdict()
@@ -98,6 +96,17 @@ class Matcher:
                 result[key] = converter(result[key])
             return result
         return None
+
+    @property
+    def regex(self):
+        return self._regex
+
+    @regex.setter
+    def regex(self, value):
+        self._regex = value
+        flags = 0 if self.case_sensitive else re.IGNORECASE
+        # cache the compiled regex
+        self._regex_compiled = re.compile(value, flags=flags)
 
     def _field_repl(self, matchobj):
         # field with type annotation
@@ -141,12 +150,12 @@ class Matcher:
         return '<Matcher("%s")>' % self.pattern
 
 
-def test(pattern, string):
-    return Matcher(pattern).test(string)
+def test(pattern, string, case_sensitive=True):
+    return Matcher(pattern, case_sensitive=case_sensitive).test(string)
 
 
-def match(pattern, string):
-    return Matcher(pattern).match(string)
+def match(pattern, string, case_sensitive=True):
+    return Matcher(pattern, case_sensitive=case_sensitive).match(string)
 
 
 def to_regex(pattern):

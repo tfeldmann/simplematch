@@ -198,3 +198,16 @@ def test_register_type():
     assert sm.match("I'm feeling {mood:smiley} *", "I'm feeling :) today!") == {
         "mood": "good"
     }
+
+
+def test_case_sensitive():
+    assert sm.test("Hello {}", "Hello World")
+    assert not sm.test("hello {}", "Hello World")
+
+    assert sm.test("Hello {}", "Hello World", case_sensitive=False)
+    assert sm.test("hello {}", "Hello World", case_sensitive=False)
+
+    # keep capture group names
+    assert sm.match("HELLO {PlAnEt}", "Hello Earth", case_sensitive=False) == {
+        "PlAnEt": "Earth"
+    }
