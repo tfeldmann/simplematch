@@ -22,7 +22,7 @@ def test_readme_example_typehints():
         "month": 1,
         "value": -12.786,
     }
-    assert matcher.match("2021-01-abc: Hello") == {}
+    assert matcher.match("2021-01-abc: Hello") == None
     assert matcher.test("1234-01: 123.123") == True
     assert (
         matcher.regex
@@ -43,6 +43,20 @@ def test_simple():
     assert sm.test("{}/{filename}?{}", "www.site.com/home/hello.js?p=1")
 
 
+def test_return_values():
+    # test() behaviour
+    assert sm.test("*.py", "hello.py") == True
+    assert sm.test("*.py", "hello.__") == False
+    assert sm.test("{}.py", "hello.py") == True
+    assert sm.test("{}.py", "hello.__") == False
+
+    # match() behaviour
+    assert sm.match("*.py", "hello.py") == {}
+    assert sm.match("*.py", "hello.__") == None
+    assert sm.match("{}.py", "hello.py") == {0: "hello"}
+    assert sm.match("{}.py", "hello.__") == None
+
+
 def test_unnamed_wildcards():
     assert sm.match("{} sees {}", "Tim sees Jacob") == {0: "Tim", 1: "Jacob"}
 
@@ -54,8 +68,8 @@ def test_simple_matching():
         "filename": "hello",
     }
 
-    # should return empty object if no match
-    assert sm.match("{folder}/{filename}?{params}", "hello.js?p=1") == dict()
+    # should return None object if no match
+    assert sm.match("{folder}/{filename}?{params}", "hello.js?p=1") == None
 
     # should match strings with . (dot) and ? (question mart) sights
     assert sm.match("{folder}/{filename}?{params}", "home/hello.js?p=1") == dict(

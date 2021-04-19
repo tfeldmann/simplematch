@@ -52,8 +52,8 @@ Then use one of these functions:
 ```python
 import simplematch
 
-simplematch.match(pattern, string) # -> returns a dict
-simplematch.test(pattern, string)  # -> return True / False
+simplematch.match(pattern, string) # -> returns a `dict` on match, `None` otherwise.
+simplematch.test(pattern, string)  # -> returns `True` on match, `False` otherwise.
 ```
 
 Or use a `Matcher` object:
@@ -63,7 +63,7 @@ import simplematch as sm
 
 matcher = sm.Matcher(pattern)
 
-matcher.match(string) # -> returns a dict
+matcher.match(string) # -> returns a dict or None
 matcher.test(string)  # -> returns True / False
 matcher.regex         # -> shows the generated regex
 ```
@@ -95,9 +95,9 @@ matcher = sm.Matcher("{year:int}-{month:int}: {value:float}")
 matcher.match("2021-01: -12.786")
 >>> {"year": 2021, "month": 1, "value": -12.786}
 
-# month is no integer, no match
+# month is no integer -> no match and return `None`.
 matcher.match("2021-AB: Hello")
->>> {}
+>>> None
 
 # no extraction, only test for match
 matcher.test("1234-01: 123.123")

@@ -97,7 +97,7 @@ class Matcher:
             for key, converter in self.converters.items():
                 result[key] = converter(result[key])
             return result
-        return {}
+        return None
 
     def _field_repl(self, matchobj):
         # field with type annotation
