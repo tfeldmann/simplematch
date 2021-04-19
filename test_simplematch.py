@@ -46,15 +46,15 @@ def test_simple():
 def test_return_values():
     # test() behaviour
     assert sm.test("*.py", "hello.py") == True
-    assert sm.test("*.py", "hello.__") == False
     assert sm.test("{}.py", "hello.py") == True
+    assert sm.test("*.py", "hello.__") == False
     assert sm.test("{}.py", "hello.__") == False
 
     # match() behaviour
     assert sm.match("*.py", "hello.py") == {}
-    assert sm.match("*.py", "hello.__") == None
     assert sm.match("{}.py", "hello.py") == {0: "hello"}
-    assert sm.match("{}.py", "hello.__") == None
+    assert sm.match("*.py", "hello.__") is None
+    assert sm.match("{}.py", "hello.__") is None
 
 
 def test_unnamed_wildcards():
