@@ -3,6 +3,7 @@
 ## WIP
 
 - Adds a `case_sensitive` option to `test()` and `match()` function. (`True` by default)
+- Allows editing and manual specification of `Matcher.regex` and `Matcher.converters`.
 
 ## v1.2 (2021-04-19)
 

@@ -211,3 +211,10 @@ def test_case_sensitive():
     assert sm.match("HELLO {PlAnEt}", "Hello Earth", case_sensitive=False) == {
         "PlAnEt": "Earth"
     }
+
+
+def test_manual_specification():
+    m = sm.Matcher()
+    m.regex = r"^(?P<test>\w+) \d+$"
+    m.converters = {"test": str.upper}
+    assert m.match("hello 123") == {"test": "HELLO"}
