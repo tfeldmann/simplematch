@@ -22,8 +22,8 @@ def test_readme_example_typehints():
         "month": 1,
         "value": -12.786,
     }
-    assert matcher.match("2021-01-abc: Hello") == None
-    assert matcher.test("1234-01: 123.123") == True
+    assert matcher.match("2021-01-abc: Hello") is None
+    assert matcher.test("1234-01: 123.123") is True
     assert (
         matcher.regex
         == "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$"
@@ -45,10 +45,10 @@ def test_simple():
 
 def test_return_values():
     # test() behaviour
-    assert sm.test("*.py", "hello.py") == True
-    assert sm.test("{}.py", "hello.py") == True
-    assert sm.test("*.py", "hello.__") == False
-    assert sm.test("{}.py", "hello.__") == False
+    assert sm.test("*.py", "hello.py") is True
+    assert sm.test("{}.py", "hello.py") is True
+    assert sm.test("*.py", "hello.__") is False
+    assert sm.test("{}.py", "hello.__") is False
 
     # match() behaviour
     assert sm.match("*.py", "hello.py") == {}
@@ -69,7 +69,7 @@ def test_simple_matching():
     }
 
     # should return None object if no match
-    assert sm.match("{folder}/{filename}?{params}", "hello.js?p=1") == None
+    assert sm.match("{folder}/{filename}?{params}", "hello.js?p=1") is None
 
     # should match strings with . (dot) and ? (question mart) sights
     assert sm.match("{folder}/{filename}?{params}", "home/hello.js?p=1") == dict(
