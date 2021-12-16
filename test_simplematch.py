@@ -1,3 +1,5 @@
+import pytest
+
 import simplematch as sm
 
 
@@ -135,21 +137,18 @@ def test_type_bitcoin():
     }
 
 
-def test_type_email():
+@pytest.mark.parametrize(
+    "string",
+    (
+        "john@doe.com",
+        "dotted.name@dotted.domain.org",
+        "ug.ly-name_1@ug-ly.domain0.co.uk",
+    ),
+)
+def test_type_email(string):
     matcher = sm.Matcher("{email:email}")
-
-    assert matcher.test("john@doe.com") is True
-    assert matcher.match("john@doe.com") == {"email": "john@doe.com"}
-
-    assert matcher.test("dotted.name@dotted.domain.org") is True
-    assert matcher.match("dotted.name@dotted.domain.org") == {
-        "email": "dotted.name@dotted.domain.org"
-    }
-
-    assert matcher.test("ug.ly-name_1@ug-ly.domain0.co.uk") is True
-    assert matcher.match("ug.ly-name_1@ug-ly.domain0.co.uk") == {
-        "email": "ug.ly-name_1@ug-ly.domain0.co.uk"
-    }
+    assert matcher.test(string) is True
+    assert matcher.match(string) == {"email": string}
 
 
 def test_type_ssn():
