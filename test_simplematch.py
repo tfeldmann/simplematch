@@ -1,4 +1,4 @@
-import pytest
+import pytest  # type: ignore
 
 import simplematch as sm
 
@@ -33,30 +33,35 @@ def test_readme_example_typehints():
     assert matcher.converters == {"year": int, "month": int, "value": float}
 
 
-def test_simple():
-    assert sm.test("*.py", "hello.py")
-    assert not sm.test("*.zip", "hello.py")
-    assert sm.test("{file}.py", "hello.py")
-    assert not sm.test("{file}.zip", "hello.py")
+@pytest.mark.parametrize(
+    "fmt, inp, result",
+    (
+        ("*.py", "hello.py", True),
+        ("*.zip", "hello.py", False),
+        ("{file}.py", "hello.py", True),
+        ("{file}.zip", "hello.py", False),
+        ("{folder}/{filename}.js", "foo/bar.js", True),
+        ("*.{extension}", "/root/folder/file.exe", True),
+        ("{folder}/{filename}.{extension}", "test/123.pdf", True),
+        ("{}/{filename}?{}", "www.site.com/home/hello.js?p=1", True),
+    ),
+)
+def test_simple(fmt, inp, result):
+    assert sm.test(fmt, inp) == result
 
-    assert sm.test("{folder}/{filename}.js", "foo/bar.js")
-    assert sm.test("*.{extension}", "/root/folder/file.exe")
-    assert sm.test("{folder}/{filename}.{extension}", "test/123.pdf")
-    assert sm.test("{}/{filename}?{}", "www.site.com/home/hello.js?p=1")
 
-
-def test_return_values():
-    # test() behaviour
-    assert sm.test("*.py", "hello.py") is True
-    assert sm.test("{}.py", "hello.py") is True
-    assert sm.test("*.py", "hello.__") is False
-    assert sm.test("{}.py", "hello.__") is False
-
-    # match() behaviour
-    assert sm.match("*.py", "hello.py") == {}
-    assert sm.match("{}.py", "hello.py") == {0: "hello"}
-    assert sm.match("*.py", "hello.__") is None
-    assert sm.match("{}.py", "hello.__") is None
+@pytest.mark.parametrize(
+    "fmt, inp, test_result, match_result",
+    (
+        ("*.py", "hello.py", True, {}),
+        ("{}.py", "hello.py", True, {0: "hello"}),
+        ("*.py", "hello.__", False, None),
+        ("{}.py", "hello.__", False, None),
+    ),
+)
+def test_result(fmt, inp, test_result, match_result):
+    assert sm.test(fmt, inp) == test_result
+    assert sm.match(fmt, inp) == match_result
 
 
 def test_unnamed_wildcards():
@@ -93,48 +98,68 @@ def test_simple_matching():
     }
 
 
-def test_type_int():
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("123", {"num": 123}),
+        ("-123", {"num": -123}),
+        ("+123", {"num": 123}),
+        ("+000123", {"num": 123}),
+        ("0123", {"num": 123}),
+        ("-123.0", None),
+    ),
+)
+def test_type_int(inp, result):
     m = sm.Matcher("{num:int}")
-    assert m.match("123") == {"num": 123}
-    assert m.match("-123") == {"num": -123}
-    assert not m.match("-123.0")
-    assert m.match("+123") == {"num": 123}
-    assert m.match("+000123") == {"num": 123}
-    assert m.match("0123") == {"num": 123}
+    assert m.match(inp) == result
 
 
-def test_type_float():
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("123.4", {"num": 123.4}),
+        ("-123.4", {"num": -123.4}),
+        ("+123.4", {"num": 123.4}),
+        ("+000123.4", {"num": 123.4}),
+        ("-123.0", {"num": -123.0}),
+    ),
+)
+def test_type_float(inp, result):
     m = sm.Matcher("{num:float}")
-    assert m.match("123.4") == {"num": 123.4}
-    assert m.match("-123.4") == {"num": -123.4}
-    assert m.match("-123.0")
-    assert m.match("+123.4") == {"num": 123.4}
-    assert m.match("+000123.4") == {"num": 123.4}
+    assert m.match(inp) == result
 
 
-def test_type_letter():
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("abcf123", {"chars": "abcf"}),
+        ("abcf123#", {"chars": "abcf"}),
+        ("ACBAAC_123", {"chars": "ACBAAC"}),
+    ),
+)
+def test_type_letter(inp, result):
     m = sm.Matcher("{chars:letters}*")
-    assert m.match("abcf123") == {"chars": "abcf"}
-    assert m.match("abcf123#") == {"chars": "abcf"}
-    assert m.match("ACBAAC_123") == {"chars": "ACBAAC"}
+    assert m.match(inp) == result
 
 
-def test_type_bitcoin():
+@pytest.mark.parametrize(
+    "inp, is_bitcoin",
+    (
+        ("1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY", True),
+        ("loremipsum", False),
+        ("16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe", True),
+        ("1EBHA1ckUWzNKN7BMfDwGTx6GKEbADUozX", True),
+        ("0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae", False),
+        ("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq", True),
+    ),
+)
+def test_type_bitcoin(inp, is_bitcoin):
     m = sm.Matcher("{coin:bitcoin}")
-    assert m.match("1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY") == {
-        "coin": "1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY"
-    }
-    assert not m.match("loremipsum")
-    assert m.match("16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe") == {
-        "coin": "16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe"
-    }
-    assert m.match("1EBHA1ckUWzNKN7BMfDwGTx6GKEbADUozX") == {
-        "coin": "1EBHA1ckUWzNKN7BMfDwGTx6GKEbADUozX"
-    }
-    assert not m.match("0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae")
-    assert m.match("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq") == {
-        "coin": "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
-    }
+    result = m.match(inp)
+    if is_bitcoin:
+        assert result == {"coin": inp}
+    else:
+        assert result == None
 
 
 @pytest.mark.parametrize(
@@ -151,53 +176,79 @@ def test_type_email(string):
     assert matcher.match(string) == {"email": string}
 
 
-def test_type_ssn():
+@pytest.mark.parametrize(
+    "inp, is_ssn",
+    (
+        ("123-45-6789", True),
+        ("123 45 6789", False),
+        ("333-22-4444", True),
+        ("aaa-bbb-cccc", False),
+        ("900-58-4564", False),
+        ("999-58-4564", False),
+        ("000-45-5454", False),
+    ),
+)
+def test_type_ssn(inp, is_ssn):
     m = sm.Matcher("{n:ssn}")
-    assert m.test("123-45-6789")
-    assert not m.test("123 45 6789")
-    assert m.test("333-22-4444")
-    assert not m.test("aaa-bbb-cccc")
-    assert not m.test("900-58-4564")
-    assert not m.test("999-58-4564")
-    assert not m.test("000-45-5454")
+    assert m.test(inp) == is_ssn
 
 
-def test_type_ipv4():
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("127.0.0.1", {"ip": "127.0.0.1"}),
+        ("192.168.1.1", {"ip": "192.168.1.1"}),
+        ("127.0.0.1", {"ip": "127.0.0.1"}),
+        ("0.0.0.0", {"ip": "0.0.0.0"}),
+        ("255.255.255.255", {"ip": "255.255.255.255"}),
+        ("256.256.256.256", None),
+        ("999.999.999.999", None),
+        ("1.2.3", None),
+        ("1.2.3.4", {"ip": "1.2.3.4"}),
+    ),
+)
+def test_type_ipv4(inp, result):
     m = sm.Matcher("{ip:ipv4}")
-    assert m.match("127.0.0.1") == {"ip": "127.0.0.1"}
-    assert m.match("192.168.1.1") == {"ip": "192.168.1.1"}
-    assert m.match("127.0.0.1") == {"ip": "127.0.0.1"}
-    assert m.match("0.0.0.0") == {"ip": "0.0.0.0"}
-    assert m.match("255.255.255.255") == {"ip": "255.255.255.255"}
-    assert not m.match("256.256.256.256")
-    assert not m.match("999.999.999.999")
-    assert not m.match("1.2.3")
-    assert m.match("1.2.3.4") == {"ip": "1.2.3.4"}
+    assert m.match(inp) == result
 
 
-def test_type_ccard():
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("4569403961014710", {"card": "4569403961014710"}),
+        ("5191914942157165", {"card": "5191914942157165"}),
+        ("370341378581367", {"card": "370341378581367"}),
+        ("38520000023237", {"card": "38520000023237"}),
+        ("6011000000000000", {"card": "6011000000000000"}),
+        ("3566002020360505", {"card": "3566002020360505"}),
+        ("1234566660000222", None),
+    ),
+)
+def test_type_ccard(inp, result):
     m = sm.Matcher("{card:ccard}")
-    assert m.match("4569403961014710") == {"card": "4569403961014710"}
-    assert m.match("5191914942157165") == {"card": "5191914942157165"}
-    assert m.match("370341378581367") == {"card": "370341378581367"}
-    assert m.match("38520000023237") == {"card": "38520000023237"}
-    assert m.match("6011000000000000") == {"card": "6011000000000000"}
-    assert m.match("3566002020360505") == {"card": "3566002020360505"}
-    assert not m.match("1234566660000222")
+    assert m.match(inp) == result
 
 
-def test_type_url():
+@pytest.mark.parametrize(
+    "inp, is_url",
+    (
+        ("abcdef", False),
+        ("www.whatever.com", False),
+        ("https://github.com/geongeorge/i-hate-regex", True),
+        ("https://www.facebook.com/", True),
+        ("https://www.google.com/", True),
+        ("https://xkcd.com/2293/", True),
+        ("https://this-shouldn't.match@example.com", False),
+        ("http://www.example.com/", True),
+    ),
+)
+def test_type_url(inp, is_url):
     m = sm.Matcher("{url:url}")
-    assert not m.match("abcdef")
-    assert not m.match("www.whatever.com")
-    assert m.match("https://github.com/geongeorge/i-hate-regex") == {
-        "url": "https://github.com/geongeorge/i-hate-regex"
-    }
-    assert m.match("https://www.facebook.com/") == {"url": "https://www.facebook.com/"}
-    assert m.match("https://www.google.com/") == {"url": "https://www.google.com/"}
-    assert m.match("https://xkcd.com/2293/") == {"url": "https://xkcd.com/2293/"}
-    assert not m.match("https://this-shouldn't.match@example.com")
-    assert m.match("http://www.example.com/") == {"url": "http://www.example.com/"}
+    result = m.match(inp)
+    if is_url:
+        assert result == {"url": inp}
+    else:
+        assert result is None
 
 
 def test_register_type():
