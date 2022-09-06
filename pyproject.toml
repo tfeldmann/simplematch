@@ -18,10 +18,10 @@ classifiers = [
     "Topic :: Utilities",
 ]
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.5"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.3"
+pytest = "^5.0.0"
 mypy = "^0.812"
 
 [build-system]
