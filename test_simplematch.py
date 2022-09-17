@@ -1,3 +1,7 @@
+import datetime
+from decimal import Decimal
+from uuid import UUID
+
 import pytest  # type: ignore
 
 import simplematch as sm
@@ -132,6 +136,57 @@ def test_type_float(inp, result):
 @pytest.mark.parametrize(
     "inp, result",
     (
+        ("123.4", {"num": Decimal("123.4")}),
+        ("-123.4", {"num": Decimal("-123.4")}),
+        ("+123.4", {"num": Decimal("123.4")}),
+        ("+000123.4", {"num": Decimal("123.4")}),
+        ("-123.0", {"num": Decimal("-123")}),
+        ("-.1", {"num": Decimal("-0.1")}),
+    ),
+)
+def test_type_decimal(inp, result):
+    m = sm.Matcher("{num:decimal}")
+    assert m.match(inp) == result
+
+
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("d4d42dd9-68de-463d-b43e-b1a12a7623d3", {"uuid": UUID("d4d42dd968de463db43eb1a12a7623d3")}),
+        ("d4d42dd968de463db43eb1a12a7623d3", {"uuid": UUID("d4d42dd968de463db43eb1a12a7623d3")}),
+        ("d4d42dd968de463db43eb1a12a7623", None),
+    ),
+)
+def test_type_uuid(inp, result):
+    m = sm.Matcher("{uuid:uuid}")
+    assert m.match(inp) == result
+
+
+def test_type_date():
+    m = sm.Matcher("{date:date}")
+    assert m.match("2022-09-16") == {"date": datetime.date(2022, 9, 16)}
+
+
+def test_type_datetime__naive():
+    now = datetime.datetime.utcnow()
+    as_str = now.isoformat()
+
+    m = sm.Matcher("{datetime:datetime}")
+    assert m.match(as_str) == {"datetime": now}
+
+
+def test_type_datetime__with_timezone():
+    m = sm.Matcher("{datetime:datetime}")
+    as_datetime = m.match("2007-11-20 22:19:17+02:00")["datetime"]
+
+    assert as_datetime.year == 2007
+    assert as_datetime.second == 17
+    assert as_datetime.tzinfo == datetime.timezone(datetime.timedelta(seconds=7200))
+
+
+@pytest.mark.parametrize(
+    "inp, result",
+    (
         ("abcf123", {"chars": "abcf"}),
         ("abcf123#", {"chars": "abcf"}),
         ("ACBAAC_123", {"chars": "ACBAAC"}),
@@ -139,6 +194,19 @@ def test_type_float(inp, result):
 )
 def test_type_letter(inp, result):
     m = sm.Matcher("{chars:letters}*")
+    assert m.match(inp) == result
+
+
+@pytest.mark.parametrize(
+    "inp, result",
+    (
+        ("abcf123", {"chars": "abcf123"}),
+        ("abcf123#", {"chars": "abcf123"}),
+        ("ACBAAC_123", {"chars": "ACBAAC_123"}),
+    ),
+)
+def test_type_identifier(inp, result):
+    m = sm.Matcher("{chars:identifier}*")
     assert m.match(inp) == result
 
 

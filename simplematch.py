@@ -2,7 +2,10 @@
 """
 simplematch
 """
+import datetime
+import decimal
 import re
+import uuid
 from collections import namedtuple
 
 # taken from the standard re module - minus "*{}", because that's our own syntax
@@ -26,7 +29,19 @@ def register_type(name, regex, converter=str):
 # include some useful basic types
 register_type("int", r"[+-]?[0-9]+", int)
 register_type("float", r"[+-]?([0-9]*[.])?[0-9]+", float)
+register_type("decimal", r"[+-]?([0-9]*[.])?[0-9]+", decimal.Decimal)
+register_type("uuid", r"[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}", uuid.UUID)
+register_type("date", r"\d{4}-\d{1,2}-\d{1,2}", datetime.date.fromisoformat)
+register_type(
+    "datetime",
+    r"\d{4}-\d{1,2}-\d{1,2}"
+    r"[T ]\d{1,2}:\d{1,2}"
+    r"(?::\d{1,2}(?:[\.,]\d{1,6}\d{0,6})?)?"
+    r"(Z|[+-]\d{2}(?::?\d{2})?)?",
+    datetime.datetime.fromisoformat
+)
 register_type("letters", r"[a-zA-Z]+")
+register_type("identifier", r"[a-zA-Z0-9_]+")
 
 # found on https://ihateregex.io/
 register_type("bitcoin", r"(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}")
