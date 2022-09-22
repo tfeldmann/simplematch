@@ -8,8 +8,8 @@ import re
 import uuid
 from collections import namedtuple
 
-# taken from the standard re module - minus "*{}", because that's our own syntax
-SPECIAL_CHARS = {i: "\\" + chr(i) for i in b"()[]?+-|^$\\.&~# \t\n\r\v\f"}
+# taken from the standard re module - minus "*+?{}", because that's our own syntax
+SPECIAL_CHARS = {i: "\\" + chr(i) for i in b"(){}-^$\\.&~# \t\n\r\v\f"}
 
 # a regex that ensures all groups to be non-capturing. Otherwise they would appear in
 # the matches
@@ -40,13 +40,11 @@ register_type(
     r"(Z|[+-]\d{2}(?::?\d{2})?)?",
     datetime.datetime.fromisoformat
 )
-register_type("letters", r"[a-zA-Z]+")
-register_type("identifier", r"[a-zA-Z0-9_]+")
+register_type("letters", r"[^\d_\W]+")
+register_type("identifier", r"\w+")
 
 # found on https://ihateregex.io/
-register_type("bitcoin", r"(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}")
 register_type("email", r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
-register_type("ssn", r"(?!0{3})(?!6{3})[0-8]\d{2}-(?!0{2})\d{2}-(?!0{4})\d{4}")
 register_type(
     "ipv4",
     (
@@ -123,32 +121,62 @@ class Matcher:
         # cache the compiled regex
         self._regex_compiled = re.compile(value, flags=flags)
 
-    def _field_repl(self, matchobj):
+    def _create_regex(self, pattern):
+        self.converters.clear()  # empty converters
+        self._unnamed_group_index = 0
+        wildcards = {
+            "*": r".*",
+            "+": r".",
+            "?": r".?",
+            "|": r"|",  # Not converted but can be escaped
+        }
+
+        result = pattern.translate(SPECIAL_CHARS)  # escape special chars
+
+        for wildcard, actual in wildcards.items():
+            not_escaped_pattern = fr"(?<!\[)\{wildcard}"
+            escaped_pattern = fr"\[\{wildcard}]"
+            result = re.sub(not_escaped_pattern, actual, result)
+            result = re.sub(escaped_pattern, fr"\{wildcard}", result)
+        result = re.sub(r"\[([^]]*)]", self._field_repl, result)  # handle groups
+        return f"^{result}$"
+
+    def _field_repl(self, match_obj):
+        group_string = match_obj.group(0).replace("\ ", "")
+        name_regex = r"(\w[\w\d_]*)"
+
+        # unnamed field, just increase the index
+        match = re.search(r"\[]", group_string)
+        if match:
+            self._unnamed_group_index += 1
+            return r"(.*)"
+
+        # unnamed field with only the type annotation
+        match = re.search(fr"\[:{name_regex}]", group_string)
+        if match:
+            type_ = match.groups()[0]
+            # register this field with the name of the type to convert it later
+            self.converters[self._unnamed_group_index] = types[type_].converter
+            self._unnamed_group_index += 1
+            return fr"({types[type_].regex})"
+
+        # field without type annotation
+        match = re.search(fr"\[{name_regex}]", group_string)
+        if match:
+            name = match.group(1)
+            return fr"(?P<{name}>.*)"
+
         # field with type annotation
-        match = re.search(r"\{(\w+):(\w+)\}", matchobj.group(0))
+        match = re.search(fr"\[{name_regex}:{name_regex}]", group_string)
         if match:
             name, type_ = match.groups()
             # register this field to convert it later
             self.converters[name] = types[type_].converter
-            return r"(?P<%s>%s)" % (name, types[type_].regex)
-
-        # field without type annotation
-        match = re.search(r"\{(\w+)\}", matchobj.group(0))
-        if match:
-            name = match.group(1)
-            return r"(?P<%s>.*)" % name
-
-    def _create_regex(self, pattern):
-        self.converters.clear()  # empty converters
-        result = pattern.translate(SPECIAL_CHARS)  # escape special chars
-        result = result.replace("*", r".*")  # handle wildcard
-        result = re.sub(r"\{\}", r"(.*)", result)  # handle unnamed group
-        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)  # handle named group
-        return r"^%s$" % result
+            return fr"(?P<{name}>{types[type_].regex})"
 
     @staticmethod
     def _grouplist(match):
-        """ extract unnamed match groups """
+        """ Add unnamed match groups to the groupdict """
         # https://stackoverflow.com/a/53385788/300783
         named = match.groupdict()
         ignored_groups = set()
@@ -162,7 +190,7 @@ class Matcher:
         ]
 
     def __repr__(self):
-        return '<Matcher("%s")>' % self.pattern
+        return f'<Matcher("{self.pattern}")>'
 
 
 def test(pattern, string, case_sensitive=True):
@@ -188,7 +216,7 @@ if __name__ == "__main__":
         "--regex", action="store_true", help="Show the generated regular expression"
     )
     args = parser.parse_args()
-    m = Matcher(args.pattern)
-    print(json.dumps(m.match(args.string)))
+    matcher = Matcher(args.pattern)
+    print(json.dumps(matcher.match(args.string)))
     if args.regex:
-        print("Regex: " + m.regex)
+        print("Regex:", matcher.regex)
