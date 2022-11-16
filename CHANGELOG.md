@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP
+
+- Literal `*` can now be matched by escaping them: `\*`
+
 ## v1.3 (2021-04-19)
 
 - Adds a `case_sensitive` option to `test()` and `match()` function. (`True` by default)

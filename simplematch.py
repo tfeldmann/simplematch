@@ -5,8 +5,8 @@ simplematch
 import re
 from collections import namedtuple
 
-# taken from the standard re module - minus "*{}", because that's our own syntax
-SPECIAL_CHARS = {i: "\\" + chr(i) for i in b"()[]?+-|^$\\.&~# \t\n\r\v\f"}
+# taken from the standard re module - minus "*{}\", because that's our own syntax
+SPECIAL_CHARS = {i: "\\" + chr(i) for i in b"()[]?+-|^$.&~#\t\n\r\v\f"}
 
 # a regex that ensures all groups to be non-capturing. Otherwise they would appear in
 # the matches
@@ -18,7 +18,7 @@ types = {}
 
 
 def register_type(name, regex, converter=str):
-    """ register a type to be available for the {value:type} matching syntax """
+    """register a type to be available for the {value:type} matching syntax"""
     cleaned = TYPE_CLEANUP_REGEX.sub("(?:", regex)
     types[name] = Type(regex=cleaned, converter=converter)
 
@@ -125,15 +125,22 @@ class Matcher:
 
     def _create_regex(self, pattern):
         self.converters.clear()  # empty converters
-        result = pattern.translate(SPECIAL_CHARS)  # escape special chars
-        result = result.replace("*", r".*")  # handle wildcard
-        result = re.sub(r"\{\}", r"(.*)", result)  # handle unnamed group
-        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)  # handle named group
+        # escape special chars
+        result = pattern.translate(SPECIAL_CHARS)
+        # handle unescaped wildcards
+        result = re.sub(r"(?<!\\)\*", r".*", result)
+        # TODO
+        # # escape left over backslashes
+        # result = re.sub(r"\\(?!\*)", "\\\\\\\\", result)
+        # handle unnamed group
+        result = re.sub(r"\{\}", r"(.*)", result)
+        # handle named group
+        result = re.sub(r"\{([^\}]*)\}", self._field_repl, result)
         return r"^%s$" % result
 
     @staticmethod
     def _grouplist(match):
-        """ extract unnamed match groups """
+        """extract unnamed match groups"""
         # https://stackoverflow.com/a/53385788/300783
         named = match.groupdict()
         ignored_groups = set()

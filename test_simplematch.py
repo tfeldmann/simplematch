@@ -28,7 +28,7 @@ def test_readme_example_typehints():
     assert matcher.test("1234-01: 123.123") is True
     assert (
         matcher.regex
-        == "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$"
+        == "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+): (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$"
     )
     assert matcher.converters == {"year": int, "month": int, "value": float}
 
@@ -285,3 +285,8 @@ def test_manual_specification():
     m.regex = r"^(?P<test>\w+) \d+$"
     m.converters = {"test": str.upper}
     assert m.match("hello 123") == {"test": "HELLO"}
+
+
+def test_escaping():
+    assert sm.match(r"* \*\*{planet}\*\*", "Hello **World**") == {"planet": "World"}
+    # TODO: assert sm.test("foo\\bar", "foo\\bar")
