@@ -18,7 +18,7 @@ types = {}
 
 
 def register_type(name, regex, converter=str):
-    """ register a type to be available for the {value:type} matching syntax """
+    """register a type to be available for the {value:type} matching syntax"""
     cleaned = TYPE_CLEANUP_REGEX.sub("(?:", regex)
     types[name] = Type(regex=cleaned, converter=converter)
 
@@ -133,7 +133,7 @@ class Matcher:
 
     @staticmethod
     def _grouplist(match):
-        """ extract unnamed match groups """
+        """extract unnamed match groups"""
         # https://stackoverflow.com/a/53385788/300783
         named = match.groupdict()
         ignored_groups = set()
