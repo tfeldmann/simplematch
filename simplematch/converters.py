@@ -2,7 +2,12 @@ import decimal
 from ipaddress import IPv4Address
 
 
-class Str:
+class QuantifierMixin:
+    def __init__(self, args):
+        pass
+
+
+class Str(QuantifierMixin):
     regex = r".*"
 
     @staticmethod
@@ -10,7 +15,7 @@ class Str:
         return value
 
 
-class Int:
+class Int(QuantifierMixin):
     regex = r"[+-]?[0-9]"
 
     @staticmethod
