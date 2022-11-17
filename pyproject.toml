@@ -20,6 +20,11 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.5"
 
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+line_length = 88
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
