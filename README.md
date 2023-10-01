@@ -144,6 +144,33 @@ sm.match("I'm feeling {mood:smiley} *", "I'm feeling :) today!")
 >>> {"mood": "good"}
 ```
 
+## CLI Command
+
+You can also install `simplematch` for use as a CLI command e.g. using `pipx`.
+
+```sh
+pipx install simplematch
+```
+
+### Usage
+
+```sh
+# Usage
+simplematch [-h] [--regex] pattern string
+```
+
+For more detailed information on the arguments you can invoke
+`simplematch --help`.
+
+### Example
+
+Extract a date from a specific file name:
+
+```sh
+simplematch "Invoice_*_{year}_{month}_{day}.pdf" "Invoice_RE2321_2021_01_15.pdf"
+>>> {"year": "2021", "month": "01", "day": "15"}
+```
+
 ## Background
 
 `simplematch` aims to fill a gap between parsing with `str.split()` and regular
