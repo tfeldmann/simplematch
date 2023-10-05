@@ -155,12 +155,16 @@ pipx install simplematch
 ### Usage
 
 ```sh
-# Usage
-simplematch [-h] [--regex] pattern string
-```
+usage: simplematch [-h] [--regex] pattern [strings ...]
 
-For more detailed information on the arguments you can invoke
-`simplematch --help`.
+positional arguments:
+  pattern     A matching pattern
+  strings     The string to match
+
+options:
+  -h, --help  show this help message and exit
+  --regex     Show the generated regular expression
+```
 
 ### Example
 
