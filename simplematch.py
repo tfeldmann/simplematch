@@ -18,7 +18,7 @@ types = {}
 
 
 def register_type(name, regex, converter=str):
-    """ register a type to be available for the {value:type} matching syntax """
+    """register a type to be available for the {value:type} matching syntax"""
     cleaned = TYPE_CLEANUP_REGEX.sub("(?:", regex)
     types[name] = Type(regex=cleaned, converter=converter)
 
@@ -133,7 +133,7 @@ class Matcher:
 
     @staticmethod
     def _grouplist(match):
-        """ extract unnamed match groups """
+        """extract unnamed match groups"""
         # https://stackoverflow.com/a/53385788/300783
         named = match.groupdict()
         ignored_groups = set()
@@ -168,15 +168,17 @@ def simplematch_cli():
 
     parser = ArgumentParser()
     parser.add_argument("pattern", help="A matching pattern")
-    parser.add_argument("string", help="The string to match")
+    parser.add_argument("strings", help="The string to match", nargs="*")
     parser.add_argument(
         "--regex", action="store_true", help="Show the generated regular expression"
     )
     args = parser.parse_args()
+
     m = Matcher(args.pattern)
-    print(json.dumps(m.match(args.string)))
     if args.regex:
         print(f"Regex: {m.regex}")
+    for string in args.strings:
+        print(json.dumps(m.match(string)))
 
 
 if __name__ == "__main__":
