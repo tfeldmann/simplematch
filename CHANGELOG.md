@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.4 (WIP)
+## v1.4 (2023-10-05)
 
 - `simplematch` now comes with a cli tool.
 
