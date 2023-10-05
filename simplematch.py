@@ -162,7 +162,7 @@ def to_regex(pattern):
     return Matcher(pattern).regex
 
 
-if __name__ == "__main__":
+def simplematch_cli():
     import json
     from argparse import ArgumentParser
 
@@ -177,3 +177,7 @@ if __name__ == "__main__":
     print(json.dumps(m.match(args.string)))
     if args.regex:
         print("Regex: " + m.regex)
+
+
+if __name__ == "__main__":
+    simplematch_cli()
