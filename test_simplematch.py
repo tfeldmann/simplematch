@@ -26,9 +26,9 @@ def test_readme_example_typehints():
     }
     assert matcher.match("2021-01-abc: Hello") is None
     assert matcher.test("1234-01: 123.123") is True
-    assert (
-        matcher.regex
-        == "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?(?:[0-9]*[.])?[0-9]+)$"
+    assert matcher.regex == (
+        "^(?P<year>[+-]?[0-9]+)\\-(?P<month>[+-]?[0-9]+):\\ (?P<value>[+-]?"
+        "(?:[0-9]*[.])?[0-9]+)$"
     )
     assert matcher.converters == {"year": int, "month": int, "value": float}
 
@@ -159,7 +159,7 @@ def test_type_bitcoin(inp, is_bitcoin):
     if is_bitcoin:
         assert result == {"coin": inp}
     else:
-        assert result == None
+        assert result is None
 
 
 @pytest.mark.parametrize(

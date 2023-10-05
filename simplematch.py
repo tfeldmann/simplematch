@@ -176,7 +176,7 @@ def simplematch_cli():
     m = Matcher(args.pattern)
     print(json.dumps(m.match(args.string)))
     if args.regex:
-        print("Regex: " + m.regex)
+        print(f"Regex: {m.regex}")
 
 
 if __name__ == "__main__":

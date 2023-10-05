@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     env:
       USING_COVERAGE: "3.9"
@@ -28,14 +28,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install pytest
-          python -m pip install mypy
+          python -m pip install poetry
+          poetry install
 
       - name: Run pytest
         run: |
-          pytest
+          poetry run pytest
 
       - name: Run mypy
         run: |
-          mypy .
+          poetry run mypy .
+
+      - name: Run ruff
+        run: |
+          poetry run ruff .
