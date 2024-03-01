@@ -25,7 +25,7 @@ simplematch = "simplematch:simplematch_cli"
 
 [tool.poetry.group.dev.dependencies]
 ruff = ">=0.0.292,<0.1.10"
-pytest = "^7.4.2"
+pytest = ">=7.4.2,<9.0.0"
 mypy = "^1.5.1"
 
 [build-system]
