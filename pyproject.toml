@@ -24,7 +24,7 @@ python = "^3.8"
 simplematch = "simplematch:simplematch_cli"
 
 [tool.poetry.group.dev.dependencies]
-ruff = ">=0.0.292,<0.1.10"
+ruff = ">=0.0.292,<0.3.1"
 pytest = ">=7.4.2,<9.0.0"
 mypy = "^1.5.1"
 
