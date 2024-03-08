@@ -28,6 +28,11 @@ ruff = ">=0.0.292,<0.3.1"
 pytest = ">=7.4.2,<9.0.0"
 mypy = "^1.5.1"
 
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+line_length = 88
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

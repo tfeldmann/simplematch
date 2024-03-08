@@ -78,7 +78,7 @@ def test_simple_matching():
     # should return None object if no match
     assert sm.match("{folder}/{filename}?{params}", "hello.js?p=1") is None
 
-    # should match strings with . (dot) and ? (question mart) sights
+    # should match strings with . (dot) and ? (question mark) signs
     assert sm.match("{folder}/{filename}?{params}", "home/hello.js?p=1") == dict(
         folder="home", filename="hello.js", params="p=1"
     )
@@ -240,6 +240,7 @@ def test_type_ccard(inp, result):
         ("https://xkcd.com/2293/", True),
         ("https://this-shouldn't.match@example.com", False),
         ("http://www.example.com/", True),
+        ("http:/ww.example.com/", False),
     ),
 )
 def test_type_url(inp, is_url):
